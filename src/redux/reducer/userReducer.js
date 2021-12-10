@@ -3,7 +3,7 @@ import * as Type from "../action";
 const initialState = {
   users: [],
   user: {},
-  loading: false,
+  loading: true,
 };
 
 const userReducer = (state = initialState, action) => {
@@ -12,9 +12,21 @@ const userReducer = (state = initialState, action) => {
       return {
         ...state,
         users: action.payload,
-        loading: true,
+        loading: false,
       };
-
+    case Type.GET_SINGLE_USER:
+      return {
+        ...state,
+        user: action.payload,
+        loading: false,
+      };
+    case Type.DELETE_USER:
+    case Type.ADD_USER:
+    case Type.UPDATE_USER:
+      return {
+        ...state,
+        loading: false,
+      };
     default:
       return state;
   }

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -8,54 +8,80 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
-
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { loadUser, userDelete } from "../redux/actions/userAction";
 
-import { loadUser } from "../redux/actions/userAction";
+const StyledTableCell = withStyles((theme) => ({
+  head: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  body: {
+    fontSize: 14,
+  },
+}))(TableCell);
 
+const StyledTableRow = withStyles((theme) => ({
+  root: {
+    "&:nth-of-type(odd)": {
+      backgroundColor: theme.palette.action.hover,
+    },
+  },
+}))(TableRow);
+
+const useStyles = makeStyles({
+  table: {
+    minWidth: 600,
+  },
+  margin: {
+    marginRight: 12,
+  },
+  paper: {
+    display: "flex",
+    alignItems: "center",
+    flexDirection: "column",
+    justifyContent: "center",
+    paddingTop: 20,
+  },
+});
+
+// Component
 const Home = () => {
+  const [mount, setMount] = useState(false);
+
   const dispatch = useDispatch();
   const { users } = useSelector((state) => state.userData);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    dispatch(loadUser());
-  });
+    if (!mount) {
+      setMount(true);
+      dispatch(loadUser());
+    }
+  }, [dispatch, mount]);
 
-  const StyledTableCell = withStyles((theme) => ({
-    head: {
-      backgroundColor: theme.palette.common.black,
-      color: theme.palette.common.white,
-    },
-    body: {
-      fontSize: 14,
-    },
-  }))(TableCell);
+  const handleDelete = (id) => {
+    if (window.confirm("please confirm the user was deleted!")) {
+      dispatch(userDelete(id));
+    }
+  };
 
-  const StyledTableRow = withStyles((theme) => ({
-    root: {
-      "&:nth-of-type(odd)": {
-        backgroundColor: theme.palette.action.hover,
-      },
-    },
-  }))(TableRow);
-
-  const useStyles = makeStyles({
-    table: {
-      minWidth: 600,
-      //   display: "flex",
-      //   flexDirection: "column",
-      //   justifyContent: "space-evenly",
-      //   alignItems: "center",
-    },
-    margin: {
-      marginRight: 12,
-    },
-  });
   const classes = useStyles();
 
   return (
     <div>
-      <TableContainer component={Paper}>
+      <TableContainer className={classes.paper} component={Paper}>
+        <Button
+          variant="contained"
+          size="medium"
+          color="primary"
+          style={{ marginBottom: 20 }}
+          onClick={() => navigate("/add-user")}
+        >
+          Add User
+        </Button>
         <Table className={classes.table} aria-label="customized table">
           <TableHead>
             <TableRow>
@@ -86,10 +112,16 @@ const Home = () => {
                       variant="contained"
                       size="small"
                       color="default"
+                      onClick={() => navigate(`/edit-user/${user.id}`)}
                     >
                       Edit
                     </Button>
-                    <Button variant="contained" size="small" color="secondary">
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="secondary"
+                      onClick={() => handleDelete(user.id)}
+                    >
                       delete
                     </Button>
                   </StyledTableCell>
