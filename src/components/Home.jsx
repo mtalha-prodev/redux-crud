@@ -60,7 +60,7 @@ const Home = () => {
       setMount(true);
       dispatch(loadUser());
     }
-  }, [dispatch, mount]);
+  }, [dispatch,  mount]);
 
   const handleDelete = (id) => {
     if (window.confirm("please confirm the user was deleted!")) {
